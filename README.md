@@ -1,5 +1,5 @@
 # GenAi-Project
--Dear teammates,
-Firstly please provide with the project name.
-With Regards,
-Advait
+-Dear teammates,<br>
+  Firstly please provide with the project name.<br>
+  With Regards,<br>
+  Advait
