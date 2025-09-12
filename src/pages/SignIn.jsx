@@ -1,40 +1,89 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import AnimatedSection from '../components/AnimatedSection';
 
-export default function SignIn({ navigateTo, handleLogin }) {
-    const handleSubmit = (e) => {
+export default function SignIn({ setIsLoggedIn }) {
+    const navigate = useNavigate();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+
+    const demoEmail = 'demo@user.com';
+    const demoPassword = 'password123';
+
+    const handleSignIn = (e) => {
         e.preventDefault();
-        handleLogin();
-        navigateTo('dashboard');
+        setError(''); 
+
+        if (email === demoEmail && password === demoPassword) {
+            setIsLoggedIn(true);
+            navigate('/');
+        } else {
+            setError('Invalid credentials. Please use the demo credentials.');
+        }
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4 pt-20">
-            <div className="w-full max-w-md">
-                <AnimatedSection className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl space-y-6">
-                    <h2 className="text-center text-3xl font-extrabold text-gray-900 dark:text-white">Sign In</h2>
-                    <form className="space-y-6" onSubmit={handleSubmit}>
-                        <div>
-                            <label htmlFor="email" className="text-sm font-medium text-gray-700 dark:text-gray-300">Email address</label>
-                            <input id="email" name="email" type="email" required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
-                        </div>
-                        <div>
-                            <label htmlFor="password" className="text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
-                            <input id="password" name="password" type="password" required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
-                        </div>
-                        <button type="submit" className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">Sign In</button>
-                    </form>
-                    <div className="mt-4 p-4 bg-indigo-50 dark:bg-gray-700 rounded-lg text-sm text-center">
-                        <p className="font-semibold text-indigo-800 dark:text-indigo-300">Demo Credentials</p>
-                        <p className="text-gray-600 dark:text-gray-400">Email: <span className="font-mono">demo@careercraft.io</span></p>
-                        <p className="text-gray-600 dark:text-gray-400">Password: <span className="font-mono">password123</span></p>
-                    </div>
-                    <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
-                        Not a member?{' '}
-                        <button onClick={() => navigateTo('signup')} className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">Sign up now</button>
+        <div className="flex items-center justify-center py-12 px-4">
+            <AnimatedSection className="max-w-md w-full space-y-8">
+                <div className="text-center">
+                    <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white">Sign in to your account</h2>
+                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                        Or{' '}
+                        <Link to="/signup" className="font-medium text-teal-600 hover:text-teal-500">
+                            start your 14-day free trial
+                        </Link>
                     </p>
-                </AnimatedSection>
-            </div>
+                </div>
+                <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl space-y-4">
+                    <div className="bg-teal-50 dark:bg-teal-900/30 border-l-4 border-teal-500 text-teal-800 dark:text-teal-200 p-4 rounded-r-lg" role="alert">
+                        <p className="font-bold">Demo Credentials</p>
+                        <p>Email: <strong>{demoEmail}</strong></p>
+                        <p>Password: <strong>{demoPassword}</strong></p>
+                    </div>
+
+                    <form className="space-y-6" onSubmit={handleSignIn}>
+                        <div>
+                            <label htmlFor="email-address" className="sr-only">Email address</label>
+                            <input
+                                id="email-address"
+                                name="email"
+                                type="email"
+                                autoComplete="email"
+                                required
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className="appearance-none rounded-lg relative block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-teal-500 focus:border-teal-500 focus:z-10 sm:text-sm"
+                                placeholder="Email address"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="password-address" className="sr-only">Password</label>
+                            <input
+                                id="password"
+                                name="password"
+                                type="password"
+                                autoComplete="current-password"
+                                required
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="appearance-none rounded-lg relative block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-teal-500 focus:border-teal-500 focus:z-10 sm:text-sm"
+                                placeholder="Password"
+                            />
+                        </div>
+
+                        {error && (
+                            <p className="text-sm text-red-500 text-center">{error}</p>
+                        )}
+
+                        <div>
+                            <button type="submit" className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-colors">
+                                Sign in
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </AnimatedSection>
         </div>
     );
-};
+}

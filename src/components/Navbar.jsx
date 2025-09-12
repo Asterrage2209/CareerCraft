@@ -1,80 +1,118 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Logo, MoonIcon, SunIcon, UserIcon, ChevronDownIcon } from './Icons';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Sun, Moon, Briefcase, MessageSquare, LogIn, LogOut, User, Menu, X } from 'lucide-react';
 
-export default function Navbar({ navigateTo, theme, toggleTheme, isAuthenticated, handleLogout }) {
-    const [isProfileOpen, setIsProfileOpen] = useState(false);
-    const profileMenuRef = useRef(null);
+const Logo = () => (
+    <div className="flex items-center space-x-2">
+        <Briefcase className="h-8 w-8 text-teal-600 dark:text-teal-500" />
+        <span className="text-2xl font-bold text-gray-800 dark:text-white">CareerCraft</span>
+    </div>
+);
 
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
-                setIsProfileOpen(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+export default function Navbar({ theme, handleThemeSwitch, isLoggedIn, setIsLoggedIn }) {
+    const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const navigate = useNavigate();
 
-    const NavLink = ({ page, children }) => (
-        <button
-            onClick={() => navigateTo(page)}
-            className="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition-colors duration-300"
-        >
-            {children}
-        </button>
-    );
+    const handleLogout = () => {
+        setIsLoggedIn(false);
+        setProfileMenuOpen(false);
+        navigate('/');
+    };
+
+    const navLinks = [
+        { href: "/consultancy", label: "Consultancy", icon: MessageSquare },
+        { href: "/jobs", label: "Job Postings", icon: Briefcase }
+    ];
+    
+    const linkClasses = "flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-500 transition-colors duration-300";
 
     return (
-        <nav className="fixed top-0 left-0 right-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm shadow-md z-50">
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm shadow-md">
             <div className="container mx-auto px-6 py-3 flex justify-between items-center">
                 <div className="flex items-center space-x-8">
-                    <button onClick={() => navigateTo('dashboard')} className="flex items-center text-indigo-600 dark:text-indigo-400">
+                    <Link to="/" onClick={() => setMobileMenuOpen(false)}>
                         <Logo />
-                    </button>
+                    </Link>
                     <div className="hidden md:flex items-center space-x-6">
-                        <NavLink page="consultancy">Consultancy</NavLink>
-                        <NavLink page="jobpostings">Job Postings</NavLink>
+                        {navLinks.map(link => (
+                            <Link key={link.href} to={link.href} className={linkClasses}>
+                                <link.icon className="h-5 w-5" />
+                                <span>{link.label}</span>
+                            </Link>
+                        ))}
                     </div>
                 </div>
 
                 <div className="flex items-center space-x-4">
-                    <button onClick={toggleTheme} className="p-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-                        {theme === 'light' ? <MoonIcon /> : <SunIcon />}
-                    </button>
-                    {isAuthenticated ? (
-                        <div className="relative" ref={profileMenuRef}>
-                            <button
-                                onClick={() => setIsProfileOpen(!isProfileOpen)}
-                                className="flex items-center space-x-2 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                            >
-                                <UserIcon />
-                                <ChevronDownIcon className={`transition-transform duration-300 ${isProfileOpen ? 'rotate-180' : ''}`} />
-                            </button>
-                            {isProfileOpen && (
-                                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5">
-                                    <a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Edit Profile</a>
-                                    <button
-                                        onClick={() => {
-                                            handleLogout();
-                                            setIsProfileOpen(false);
-                                        }}
-                                        className="w-full text-left block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                                    >
-                                        Log Out
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    ) : (
-                        <button
-                            onClick={() => navigateTo('signin')}
-                            className="bg-indigo-600 text-white px-4 py-2 rounded-md font-semibold hover:bg-indigo-700 transition-transform duration-300 ease-in-out transform hover:scale-105"
-                        >
-                            Sign In
+                    <div className="hidden md:flex items-center space-x-4">
+                        <button onClick={handleThemeSwitch} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                            {theme === 'dark' ? <Sun className="h-5 w-5 text-yellow-400" /> : <Moon className="h-5 w-5 text-gray-600" />}
                         </button>
-                    )}
+
+                        {isLoggedIn ? (
+                            <div className="relative">
+                                <button onClick={() => setProfileMenuOpen(!profileMenuOpen)} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                                    <User className="h-5 w-5" />
+                                </button>
+                                {profileMenuOpen && (
+                                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5">
+                                        <a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Edit Profile</a>
+                                        <button onClick={handleLogout} className="w-full text-left block px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                            Log Out
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <Link to="/signin" className="flex items-center space-x-2 bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-4 rounded-lg transition-transform duration-300 hover:scale-105">
+                                <LogIn className="h-5 w-5" />
+                                <span>Sign In</span>
+                            </Link>
+                        )}
+                    </div>
+                    
+                    <div className="md:hidden">
+                        <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+                            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                        </button>
+                    </div>
                 </div>
             </div>
+
+            {}
+            {mobileMenuOpen && (
+                <div className="md:hidden bg-white dark:bg-gray-900 py-4 px-6 space-y-4">
+                     {navLinks.map(link => (
+                        <Link key={link.href} to={link.href} className={linkClasses} onClick={() => setMobileMenuOpen(false)}>
+                            <link.icon className="h-5 w-5" />
+                            <span>{link.label}</span>
+                        </Link>
+                    ))}
+                    <hr className="border-gray-200 dark:border-gray-700" />
+                    <div className="flex items-center justify-between">
+                         <span className="text-sm">Switch Theme</span>
+                         <button onClick={handleThemeSwitch} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                            {theme === 'dark' ? <Sun className="h-5 w-5 text-yellow-400" /> : <Moon className="h-5 w-5 text-gray-600" />}
+                        </button>
+                    </div>
+                     {isLoggedIn ? (
+                        <div className='space-y-2'>
+                            <button className="w-full text-left flex items-center space-x-2 py-2">
+                                <User className="h-5 w-5" /><span>Edit Profile</span>
+                            </button>
+                            <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="w-full text-left flex items-center space-x-2 text-red-500 py-2">
+                                <LogOut className="h-5 w-5" /><span>Log Out</span>
+                            </button>
+                        </div>
+                     ) : (
+                         <Link to="/signin" onClick={() => setMobileMenuOpen(false)} className="flex w-full justify-center items-center space-x-2 bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-4 rounded-lg transition-transform duration-300 hover:scale-105">
+                            <LogIn className="h-5 w-5" />
+                            <span>Sign In</span>
+                        </Link>
+                     )}
+                </div>
+            )}
         </nav>
     );
 }
