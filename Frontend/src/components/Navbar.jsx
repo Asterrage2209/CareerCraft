@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Sun, Moon, Briefcase, MessageSquare, LogIn, LogOut, User, Menu, X } from 'lucide-react';
+import { Sun, Moon, Briefcase, MessageSquare, LogIn, LogOut, User, Menu, X, School } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
 
 const Logo = () => (
     <div className="flex items-center space-x-2">
@@ -9,23 +10,61 @@ const Logo = () => (
     </div>
 );
 
-export default function Navbar({ theme, handleThemeSwitch, isLoggedIn, setIsLoggedIn }) {
+
+const NavLink = ({ to, children, onClick }) => {
+    const { isAuthenticated } = useAuth();
+    const navigate = useNavigate();
+
+    const handleClick = (e) => {
+        if (!isAuthenticated) {
+            e.preventDefault();
+            navigate('/signin');
+        }
+        if(onClick) onClick();
+    };
+
+    return (
+        <Link to={to} onClick={handleClick} className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-500 transition-colors duration-300">
+            {children}
+        </Link>
+    );
+};
+
+
+export default function Navbar({ theme, handleThemeSwitch }) {
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const navigate = useNavigate();
+    const { user, logout, isAuthenticated } = useAuth();
 
     const handleLogout = () => {
-        setIsLoggedIn(false);
+        logout();
         setProfileMenuOpen(false);
+        setMobileMenuOpen(false);
         navigate('/');
     };
-
-    const navLinks = [
-        { href: "/consultancy", label: "Consultancy", icon: MessageSquare },
-        { href: "/jobs", label: "Job Postings", icon: Briefcase }
-    ];
     
-    const linkClasses = "flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-500 transition-colors duration-300";
+    const getNavLinks = () => {
+        const commonLinks = [
+            { href: "/consultancy", label: "Consultancy", icon: MessageSquare },
+        ];
+        if (isAuthenticated) {
+            if (user.role === 'college_student') {
+                return [...commonLinks, { href: "/jobs", label: "Job Postings", icon: Briefcase }];
+            }
+            if (user.role === 'school_student') {
+                return [...commonLinks, { href: "/college-admissions", label: "College Admissions", icon: School }];
+            }
+        }
+        // Not logged in
+        return [
+            ...commonLinks,
+            { href: "/jobs", label: "Job Postings", icon: Briefcase },
+            { href: "/college-admissions", label: "College Admissions", icon: School }
+        ];
+    };
+
+    const navLinks = getNavLinks();
 
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm shadow-md">
@@ -36,10 +75,10 @@ export default function Navbar({ theme, handleThemeSwitch, isLoggedIn, setIsLogg
                     </Link>
                     <div className="hidden md:flex items-center space-x-6">
                         {navLinks.map(link => (
-                            <Link key={link.href} to={link.href} className={linkClasses}>
+                            <NavLink key={link.href} to={link.href}>
                                 <link.icon className="h-5 w-5" />
                                 <span>{link.label}</span>
-                            </Link>
+                            </NavLink>
                         ))}
                     </div>
                 </div>
@@ -50,14 +89,14 @@ export default function Navbar({ theme, handleThemeSwitch, isLoggedIn, setIsLogg
                             {theme === 'dark' ? <Sun className="h-5 w-5 text-yellow-400" /> : <Moon className="h-5 w-5 text-gray-600" />}
                         </button>
 
-                        {isLoggedIn ? (
+                        {isAuthenticated ? (
                             <div className="relative">
                                 <button onClick={() => setProfileMenuOpen(!profileMenuOpen)} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
                                     <User className="h-5 w-5" />
                                 </button>
                                 {profileMenuOpen && (
                                     <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5">
-                                        <a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Edit Profile</a>
+                                        <Link to="/edit-profile" onClick={() => setProfileMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Edit Profile</Link>
                                         <button onClick={handleLogout} className="w-full text-left block px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-gray-700">
                                             Log Out
                                         </button>
@@ -80,14 +119,13 @@ export default function Navbar({ theme, handleThemeSwitch, isLoggedIn, setIsLogg
                 </div>
             </div>
 
-            {}
             {mobileMenuOpen && (
                 <div className="md:hidden bg-white dark:bg-gray-900 py-4 px-6 space-y-4">
                      {navLinks.map(link => (
-                        <Link key={link.href} to={link.href} className={linkClasses} onClick={() => setMobileMenuOpen(false)}>
+                        <NavLink key={link.href} to={link.href} onClick={() => setMobileMenuOpen(false)}>
                             <link.icon className="h-5 w-5" />
                             <span>{link.label}</span>
-                        </Link>
+                        </NavLink>
                     ))}
                     <hr className="border-gray-200 dark:border-gray-700" />
                     <div className="flex items-center justify-between">
@@ -96,12 +134,12 @@ export default function Navbar({ theme, handleThemeSwitch, isLoggedIn, setIsLogg
                             {theme === 'dark' ? <Sun className="h-5 w-5 text-yellow-400" /> : <Moon className="h-5 w-5 text-gray-600" />}
                         </button>
                     </div>
-                     {isLoggedIn ? (
+                     {isAuthenticated ? (
                         <div className='space-y-2'>
-                            <button className="w-full text-left flex items-center space-x-2 py-2">
+                            <Link to="/edit-profile" onClick={() => setMobileMenuOpen(false)} className="w-full text-left flex items-center space-x-2 py-2">
                                 <User className="h-5 w-5" /><span>Edit Profile</span>
-                            </button>
-                            <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="w-full text-left flex items-center space-x-2 text-red-500 py-2">
+                            </Link>
+                            <button onClick={handleLogout} className="w-full text-left flex items-center space-x-2 text-red-500 py-2">
                                 <LogOut className="h-5 w-5" /><span>Log Out</span>
                             </button>
                         </div>

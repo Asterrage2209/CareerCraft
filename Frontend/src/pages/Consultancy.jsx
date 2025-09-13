@@ -1,8 +1,7 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
 import AnimatedSection from '../components/AnimatedSection';
 
-// Hardcoded chat data
+// TODO: Remove hard-coded. Get real chat from API
 const chatMessages = [
     { sender: 'user', text: "Hi, I'm looking for a career change. I have a background in marketing but I'm interested in tech." },
     { sender: 'ai', text: "That's a popular path! With a marketing background, you have strong communication skills. Have you considered roles like Product Marketing Manager or UX Writer in a tech company?" },
@@ -12,14 +11,9 @@ const chatMessages = [
     { sender: 'ai', text: "Great! Here are a few top-rated courses on Coursera and Udemy to get you started on your journey to becoming a Product Marketing Manager." }
 ];
 
-export default function Consultancy({ isLoggedIn }) {
-    // If not logged in, redirect to the signin page
-    if (!isLoggedIn) {
-        return <Navigate to="/signin" replace />;
-    }
+export default function Consultancy() {
 
     return (
-        // Single parent element to wrap the entire component's output
         <div className="container mx-auto px-4 py-12">
             <AnimatedSection>
                 <h1 className="text-4xl font-extrabold text-center mb-4 text-gray-800 dark:text-white">AI Career Consultancy</h1>
