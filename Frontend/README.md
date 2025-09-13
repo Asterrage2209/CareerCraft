@@ -56,7 +56,7 @@ The application will now be running on `http://localhost:5173`.
 
 ---
 
-###  डेमो क्रेडेंशियल्स (Demo Credentials)
+###  Demo Credentials
 
 Use the following credentials on the Sign In page to test the different user roles:
 
