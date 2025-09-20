@@ -1,91 +1,123 @@
-# CareerCraft - AI-Based Career & Skills Advisor
+# CareerCraft 🚀
 
-CareerCraft is a modern, responsive web application designed to provide personalized career and skills advice using an AI-driven chat interface. It also features a curated job board to help users find their next opportunity.
-
----
+CareerCraft is a modern, AI-powered career guidance platform that helps students and professionals navigate their career paths through personalized consultancy, job opportunities, and educational resources.
 
 ## ✨ Features
 
-* 🌗 **Light/Dark Mode:** Seamless theme switching for user comfort.
-* 🧭 **Modern Navbar:** Easy navigation with dropdowns and conditional UI.
-* 🔑 **Secure Auth:** Separate, validated pages for Sign In and Sign Up.
-* 🏠 **Animated Dashboard:** A beautiful hero section and feature cards with smooth scroll animations.
-* 💬 **AI Consultancy:** An interactive chat interface to get career advice. (Currently hardcoded).
-* 📄 **Job Postings:** A blog-style page displaying recent, relevant job opportunities. (Currently hardcoded).
-* 📱 **Fully Responsive:** Built with Tailwind CSS for a flawless experience on any device.
+* 🤖 **AI Consultancy:** Interactive chat interface for personalized career advice
+* 🔐 **Secure Authentication:** Complete user authentication system with MongoDB
+* 💼 **Job Board:** Curated job postings and opportunities
+* 🎓 **College Admissions:** Guidance for educational pathways
+* 👤 **Profile Management:** Personalized user profiles and settings
+* 🌗 **Light/Dark Mode:** Seamless theme switching for user comfort
+* 📱 **Fully Responsive:** Optimized experience across all devices
 
----
+## 🛠️ Tech Stack
 
-## 🛠️ Built With
+### Frontend
+- React.js (via Vite)
+- Tailwind CSS
+- React Router
+- Modern UI Components
 
-* **Frontend:** React (via Vite)
-* **Styling:** Tailwind CSS
-* **Linting:** ESLint
-
----
+### Backend
+- Node.js
+- Express.js
+- MongoDB
+- JWT Authentication
 
 ## 🚀 Getting Started
 
-To get a local copy up and running, follow these simple steps.
-
 ### Prerequisites
+- Node.js (v16 or higher)
+- MongoDB
+- npm or yarn
 
-You need to have Node.js (version 16.x or higher) and npm installed on your machine.
+### Installation
 
-### Installation & Setup
+1. **Clone the repository**
+```bash
+git clone https://github.com/yourusername/CareerCraft.git
+cd CareerCraft
+```
 
-1.  **Clone the repository:**
-    ```sh
-    git clone [https://github.com/your-username/careercraft.git](https://github.com/your-username/careercraft.git)
-    cd careercraft
-    ```
+2. **Install Dependencies**
+```bash
+# Install backend dependencies
+cd Backend
+npm install
 
-2.  **Install NPM packages:**
-    ```sh
-    npm install
-    ```
+# Install frontend dependencies
+cd ../Frontend
+npm install
+```
 
-3.  **Start the development server:**
-    ```sh
-    npm run dev
-    ```
+3. **Environment Setup**
 
-The application will now be running on `http://localhost:5173`.
+Create `.env` files in both Backend and Frontend directories:
 
----
+Backend/.env:
+```
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+GEMINI_API_KEY=your_gemini_api_key
+PORT=5000
+NODE_ENV=development
+PORT=5000
+MONGODB_URI=your_mongodb_connection_string
+```
 
-## 📂 File Structure
+Frontend/.env:
+```
+VITE_API_URL=http://localhost:5000/api
+```
 
-The project follows a standard Vite + React structure to keep the codebase organized and scalable.
+4. **Start the Application**
+```bash
+# Start Backend Server
+cd Backend
+npm start
+
+# Start Frontend Development Server
+cd Frontend
+npm run dev
+```
+
+## 📂 Project Structure
 
 ```
-careercraft/
-├── .eslintrc.cjs
-├── .gitignore
-├── index.html
-├── package.json
-├── postcss.config.js
-├── tailwind.config.js
-├── vite.config.js
-├── README.md
+CareerCraft/
+├── Backend/
+│   ├── controller/
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   └── server.js
 │
-└── src/
-    ├── App.jsx
-    ├── index.css
-    ├── main.jsx
-    │
-    ├── components/
-    │   ├── AnimatedSection.jsx
-    │   ├── Icons.jsx
-    │   └── Navbar.jsx
-    │
-    ├── hooks/
-    │   └── useOnScreen.js
-    │
-    └── pages/
-        ├── Consultancy.jsx
-        ├── Dashboard.jsx
-        ├── JobPostings.jsx
-        ├── SignIn.jsx
-        └── SignUp.jsx
+└── Frontend/
+    ├── src/
+    │   ├── components/
+    │   ├── hooks/
+    │   ├── pages/
+    │   ├── utils/
+    │   ├── App.jsx
+    │   └── main.jsx
+    └── index.html
 ```
+
+## ⏳ Current Status
+
+- ✅ User Authentication System
+- ✅ Basic AI Consultancy
+- ✅ Job Postings
+- ⏳ Advanced AI Features (Coming Soon)
+- ⏳ Resume Builder (In Development)
+- ⏳ Interview Preparation Module (In Development)
+
+## 🤝 Contributing
+
+We welcome contributions! Feel free to submit issues and pull requests.
+
+## 📫 Feedback & Bug Reports
+
+Found a bug or have a suggestion? Please email us at slapandya1407@gmail.com

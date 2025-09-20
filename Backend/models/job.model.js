@@ -5,7 +5,7 @@ const JobSchema = new mongoose.Schema({
   jobTitle: String,
   company: String,
   location: String,
-  source: String, // e.g. Google Jobs API
+  source: String, 
   matchScore: { type: Number },
   applied: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now }

@@ -1,7 +1,7 @@
-import userModel from "../models/user.model.js";
+const userModel = require("../models/user.model");
+const bcrypt = require("bcryptjs");
 
 const login = async (req, res) => {
-
     const { email, password } = req.body;
 
     try {
@@ -9,7 +9,8 @@ const login = async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
-        const isMatch = await bcrypt.compare(password, user.password);
+        
+        const isMatch = await user.comparePassword(password);
         if (!isMatch) {
             return res.status(400).json({ message: "Invalid credentials" });
         }
@@ -21,8 +22,15 @@ const login = async (req, res) => {
         }
 
         res.json({
-            token, user:
-                { id: user._id, name: user.name, email: user.email }
+            token, 
+            user: { 
+                id: user._id, 
+                name: user.name, 
+                email: user.email, 
+                phone: user.phone, 
+                role: user.role,
+                profilePicture: user.profilePicture
+            }
         });
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -30,31 +38,34 @@ const login = async (req, res) => {
 }
 
 const signup = async (req, res) => {
-
     try {
-        const { name, email, password } = req.body;
+        const { name, email, password, phone, role = "student", profilePicture } = req.body;
 
-        const isExists = await User.findOne({ email });
+        const isExists = await userModel.findOne({ email });
         if (isExists) return res.status(400).json({ message: "User already exists" });
 
-        // Hash password
-        const hashedPassword = await userModel.hashedPassword(password);
-
-        // Create new user
-        const newUser = new User({ name, email, password: hashedPassword });
+        const newUser = new userModel({ name, email, password, phone, role, profilePicture });
         await newUser.save();
 
-        // Generate JWT
         const token = await newUser.generateJWT();
 
-        res.json({ token, user: { id: newUser._id, name: newUser.name, email: newUser.email } });
+        res.json({ 
+            token, 
+            user: { 
+                id: newUser._id, 
+                name: newUser.name, 
+                email: newUser.email, 
+                phone: newUser.phone, 
+                role: newUser.role,
+                profilePicture: newUser.profilePicture
+            } 
+        });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 }
 
 const getUserProfile = async (req, res) => {
-
     try {
         const user = await userModel.findById(req.user.id).select("-password");
         if (!user) return res.status(404).json({ message: "User not found" });
@@ -63,8 +74,47 @@ const getUserProfile = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 }
+
+const updateUserProfile = async (req, res) => {
+    try {
+        const { name, phone, profilePicture, skills, interests } = req.body;
+        const userId = req.user.id;
+
+        const updateData = {};
+        if (name) updateData.name = name;
+        if (phone) updateData.phone = phone;
+        if (profilePicture) updateData.profilePicture = profilePicture;
+        if (skills) updateData.skills = skills;
+        if (interests) updateData.interests = interests;
+
+        const user = await userModel.findByIdAndUpdate(
+            userId, 
+            updateData, 
+            { new: true, runValidators: true }
+        ).select("-password");
+
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        res.json({
+            success: true,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                role: user.role,
+                profilePicture: user.profilePicture,
+                skills: user.skills,
+                interests: user.interests
+            }
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
 module.exports = { 
     login, 
     signup,
-    getUserProfile
+    getUserProfile,
+    updateUserProfile
 };

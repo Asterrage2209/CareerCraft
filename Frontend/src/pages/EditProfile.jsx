@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { authAPI } from '../utils/auth';
 import AnimatedSection from '../components/AnimatedSection';
 
 export default function EditProfile() {
-    const { user, updateUser } = useAuth();
+    const { user, updateUser, token } = useAuth();
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
@@ -28,12 +29,26 @@ export default function EditProfile() {
         }
     };
     
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // TODO: Backend integration to save the profile data
-        updateUser({...formData, profilePicture: profilePic});
-        console.log("Profile Saved (locally):", { ...formData, profilePicture: profilePic });
-        navigate('/'); 
+        try {
+            // Update user data on backend
+            const response = await authAPI.updateProfile({
+                name: formData.name,
+                phone: formData.phone,
+                profilePicture: profilePic
+            }, token);
+            
+            // Update user data locally
+            updateUser({...formData, profilePicture: profilePic});
+            console.log("Profile Saved successfully:", response);
+            navigate('/'); 
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            // Still update locally as fallback
+            updateUser({...formData, profilePicture: profilePic});
+            navigate('/');
+        }
     };
 
     return (
@@ -43,7 +58,11 @@ export default function EditProfile() {
                 <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl">
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="flex flex-col items-center space-y-4">
-                            <img src={profilePic} alt="Profile" className="w-32 h-32 rounded-full object-cover" />
+                            <img 
+                                src={profilePic || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDEyOCAxMjgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxjaXJjbGUgY3g9IjY0IiBjeT0iNjQiIHI9IjY0IiBmaWxsPSIjRjNGNEY2Ii8+CjxjaXJjbGUgY3g9IjY0IiBjeT0iNDgiIHI9IjE2IiBmaWxsPSIjOUNBM0FGIi8+CjxwYXRoIGQ9Ik0zMiAxMDFDMzIgODcuNjQgNDMuNjQgNzYgNTcgNzZINzFDODQuMzYgNzYgOTYgODcuNjQgOTYgMTAxVjEwMUgzMloiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+Cg=='} 
+                                alt="Profile" 
+                                className="w-32 h-32 rounded-full object-cover border-4 border-gray-200 dark:border-gray-600" 
+                            />
                             <input
                                 type="file"
                                 id="profilePicture"

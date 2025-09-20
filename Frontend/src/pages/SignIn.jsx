@@ -3,18 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import AnimatedSection from '../components/AnimatedSection';
 
-const demoCredentials = {
-    college: {
-        email: 'college_demo@careercraft.test',
-        password: 'College123!',
-        role: 'college_student'
-    },
-    school: {
-        email: 'school_demo@careercraft.test',
-        password: 'School123!',
-        role: 'school_student'
-    }
-};
 
 export default function SignIn() {
     const navigate = useNavigate();
@@ -23,19 +11,15 @@ export default function SignIn() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
 
-    const handleSignIn = (e) => {
+    const handleSignIn = async (e) => {
         e.preventDefault();
         setError('');
 
-        // TODO: Replace with backend auth
-        if (email === demoCredentials.college.email && password === demoCredentials.college.password) {
-            login({ email, role: demoCredentials.college.role });
-            navigate('/');
-        } else if (email === demoCredentials.school.email && password === demoCredentials.school.password) {
-            login({ email, role: demoCredentials.school.role });
+        const result = await login(email, password);
+        if (result.success) {
             navigate('/');
         } else {
-            setError('Invalid credentials. Please use one of the demo accounts.');
+            setError(result.error || 'Login failed. Please try again.');
         }
     };
 
@@ -51,20 +35,7 @@ export default function SignIn() {
                         </Link>
                     </p>
                 </div>
-                <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl space-y-4">
-                    <div className="space-y-4">
-                        <div className="bg-teal-50 dark:bg-teal-900/30 border-l-4 border-teal-500 text-teal-800 dark:text-teal-200 p-4 rounded-r-lg" role="alert">
-                            <p className="font-bold">College Student Demo</p>
-                            <p>Email: <strong>{demoCredentials.college.email}</strong></p>
-                            <p>Password: <strong>{demoCredentials.college.password}</strong></p>
-                        </div>
-                        <div className="bg-indigo-50 dark:bg-indigo-900/30 border-l-4 border-indigo-500 text-indigo-800 dark:text-indigo-200 p-4 rounded-r-lg" role="alert">
-                            <p className="font-bold">School Student Demo</p>
-                            <p>Email: <strong>{demoCredentials.school.email}</strong></p>
-                            <p>Password: <strong>{demoCredentials.school.password}</strong></p>
-                        </div>
-                    </div>
-
+                <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl">
                     <form className="space-y-6" onSubmit={handleSignIn}>
                         <div>
                             <input

@@ -91,8 +91,16 @@ export default function Navbar({ theme, handleThemeSwitch }) {
 
                         {isAuthenticated ? (
                             <div className="relative">
-                                <button onClick={() => setProfileMenuOpen(!profileMenuOpen)} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
-                                    <User className="h-5 w-5" />
+                                <button onClick={() => setProfileMenuOpen(!profileMenuOpen)} className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                                    {user?.profilePicture ? (
+                                        <img 
+                                            src={user.profilePicture} 
+                                            alt="Profile" 
+                                            className="h-8 w-8 rounded-full object-cover"
+                                        />
+                                    ) : (
+                                        <User className="h-5 w-5" />
+                                    )}
                                 </button>
                                 {profileMenuOpen && (
                                     <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5">
@@ -136,6 +144,18 @@ export default function Navbar({ theme, handleThemeSwitch }) {
                     </div>
                      {isAuthenticated ? (
                         <div className='space-y-2'>
+                            <div className="flex items-center space-x-3 py-2">
+                                {user?.profilePicture ? (
+                                    <img 
+                                        src={user.profilePicture} 
+                                        alt="Profile" 
+                                        className="h-8 w-8 rounded-full object-cover"
+                                    />
+                                ) : (
+                                    <User className="h-5 w-5" />
+                                )}
+                                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{user?.name}</span>
+                            </div>
                             <Link to="/edit-profile" onClick={() => setMobileMenuOpen(false)} className="w-full text-left flex items-center space-x-2 py-2">
                                 <User className="h-5 w-5" /><span>Edit Profile</span>
                             </Link>

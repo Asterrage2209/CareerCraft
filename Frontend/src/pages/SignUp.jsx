@@ -7,7 +7,7 @@ import { checkPasswordStrength } from '../utils/auth';
 
 export default function SignUp() {
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { signup } = useAuth();
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -16,6 +16,7 @@ export default function SignUp() {
         password: '',
         confirmPassword: '',
     });
+    const [profilePicture, setProfilePicture] = useState(null);
     const [errors, setErrors] = useState({});
     const [passwordStrength, setPasswordStrength] = useState(0);
 
@@ -26,6 +27,29 @@ export default function SignUp() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handlePictureChange = (e) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                setErrors({ ...errors, profilePicture: 'File size must be less than 5MB' });
+                return;
+            }
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                setErrors({ ...errors, profilePicture: 'Please select a valid image file' });
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                setProfilePicture(event.target.result);
+                setErrors({ ...errors, profilePicture: '' });
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     const validate = () => {
@@ -40,16 +64,26 @@ export default function SignUp() {
         return newErrors;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const validationErrors = validate();
         setErrors(validationErrors);
 
         if (Object.keys(validationErrors).length === 0) {
-            // TODO: Replace with backend registration
-            console.log('Form submitted successfully:', formData);
-            login({ email: formData.email, name: formData.name, role: formData.role });
-            navigate('/');
+            const result = await signup({
+                name: formData.name,
+                email: formData.email,
+                phone: formData.phone,
+                password: formData.password,
+                role: formData.role,
+                profilePicture: profilePicture
+            });
+            
+            if (result.success) {
+                navigate('/');
+            } else {
+                setErrors({ general: result.error || 'Signup failed. Please try again.' });
+            }
         }
     };
     
@@ -68,6 +102,42 @@ export default function SignUp() {
                 <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl">
                     <form className="space-y-6" onSubmit={handleSubmit} noValidate>
                         
+                        {/* Profile Picture Upload */}
+                        <div className="flex flex-col items-center space-y-4">
+                            <div className="relative">
+                                <img 
+                                    src={profilePicture || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTYiIGhlaWdodD0iOTYiIHZpZXdCb3g9IjAgMCA5NiA5NiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iNDgiIGN5PSI0OCIgcj0iNDgiIGZpbGw9IiNGM0Y0RjYiLz4KPGNpcmNsZSBjeD0iNDgiIGN5PSIzNiIgcj0iMTIiIGZpbGw9IiM5Q0EzQUYiLz4KPHBhdGggZD0iTTI0IDc2QzI0IDY1LjYgMzIuNiA1NyA0MyA1N0g1M0M2My40IDU3IDcyIDY1LjYgNzIgNzZWNzZIMjRaIiBmaWxsPSIjOUNBM0FGIi8+Cjwvc3ZnPgo='} 
+                                    alt="Profile Preview" 
+                                    className="w-24 h-24 rounded-full object-cover border-4 border-gray-200 dark:border-gray-600"
+                                />
+                                {profilePicture && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setProfilePicture(null)}
+                                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
+                                    >
+                                        ×
+                                    </button>
+                                )}
+                            </div>
+                            <div>
+                                <input
+                                    type="file"
+                                    id="profilePicture"
+                                    className="hidden"
+                                    accept="image/*"
+                                    onChange={handlePictureChange}
+                                />
+                                <label 
+                                    htmlFor="profilePicture" 
+                                    className="cursor-pointer bg-teal-100 text-teal-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-teal-200 dark:bg-teal-900 dark:text-teal-200 dark:hover:bg-teal-800"
+                                >
+                                    {profilePicture ? 'Change Photo' : 'Add Profile Photo'}
+                                </label>
+                            </div>
+                            {errors.profilePicture && <p className="text-xs text-red-500">{errors.profilePicture}</p>}
+                        </div>
+                        
                         <InputField name="name" type="text" placeholder="Full Name" value={formData.name} onChange={handleChange} error={errors.name} />
                         <InputField name="email" type="email" placeholder="Email Address" value={formData.email} onChange={handleChange} error={errors.email} />
                         <InputField name="phone" type="tel" placeholder="Phone Number" value={formData.phone} onChange={handleChange} error={errors.phone} />
@@ -84,6 +154,8 @@ export default function SignUp() {
                         <PasswordMeter strength={passwordStrength} />
                         
                         <InputField name="confirmPassword" type="password" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleChange} error={errors.confirmPassword} />
+
+                        {errors.general && <p className="text-sm text-red-500 text-center">{errors.general}</p>}
 
                         <div>
                             <button type="submit" className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-teal-600 hover:bg-teal-700">

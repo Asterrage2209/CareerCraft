@@ -7,7 +7,7 @@ const CareerPathSchema = new mongoose.Schema({
     {
       title: String,
       description: String,
-      resources: [String], // links to YouTube/Books API
+      resources: [String], 
       status: { type: String, enum: ["pending", "in-progress", "completed"], default: "pending" }
     }
   ],
