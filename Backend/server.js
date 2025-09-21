@@ -6,59 +6,85 @@ require('dotenv').config();
 
 const app = express();
 
-// Debug logging middleware
+// Debug middleware - Add detailed logging
 app.use((req, res, next) => {
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+    console.log(`[DEBUG] ${req.method} ${req.path}`);
+    console.log('[DEBUG] Headers:', req.headers);
+    if (req.method === 'POST') {
+        console.log('[DEBUG] Body:', req.body);
+    }
     next();
 });
 
 // Core middleware
-app.use(cors());
+app.use(cors({
+    origin: true,
+    credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Health check route
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: 'OK' });
+});
 
 // API Routes
 const userRoutes = require('./routes/user.routes');
 const consultancyRoutes = require('./routes/consultancy.routes');
 
+// Mount routes with explicit paths
 app.use('/api/users', userRoutes);
 app.use('/api/consultancy', consultancyRoutes);
 
-// Serve static files
+// Static file serving
 const distPath = path.join(__dirname, '../Frontend/dist');
 app.use(express.static(distPath));
 
-// Handle SPA routing - using middleware instead of wildcard route
+// SPA handler - No wildcard, use middleware
 app.use((req, res, next) => {
-    // Skip API routes
     if (req.path.startsWith('/api')) {
-        return next();
+        next();
+        return;
     }
-    res.sendFile(path.join(distPath, 'index.html'));
-});
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error('Server Error:', err);
-    res.status(500).json({ 
-        message: process.env.NODE_ENV === 'production' 
-            ? 'Internal server error' 
-            : err.message 
+    res.sendFile(path.join(distPath, 'index.html'), err => {
+        if (err) {
+            console.error('[ERROR] Failed to send file:', err);
+            next(err);
+        }
     });
 });
 
-// MongoDB connection and server startup
+// Error handling
+app.use((err, req, res, next) => {
+    console.error('[ERROR]', err);
+    res.status(500).json({
+        success: false,
+        message: process.env.NODE_ENV === 'production' 
+            ? 'Internal server error' 
+            : err.message
+    });
+});
+
+// MongoDB and Server startup
 const PORT = process.env.PORT || 5000;
+
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => {
-        console.log('MongoDB Connected');
+        console.log('[INFO] MongoDB Connected');
         app.listen(PORT, () => {
-            console.log(`Server running on port ${PORT}`);
-            console.log(`Environment: ${process.env.NODE_ENV}`);
-            console.log(`Static files path: ${distPath}`);
+            console.log(`[INFO] Server running on port ${PORT}`);
+            console.log(`[INFO] Environment: ${process.env.NODE_ENV}`);
+            console.log(`[INFO] Static files path: ${distPath}`);
+            // Print all registered routes
+            app._router.stack.forEach(r => {
+                if (r.route && r.route.path) {
+                    console.log(`[INFO] Route: ${r.route.path}`);
+                }
+            });
         });
     })
     .catch(err => {
-        console.error('MongoDB connection error:', err);
+        console.error('[ERROR] MongoDB connection failed:', err);
         process.exit(1);
     });

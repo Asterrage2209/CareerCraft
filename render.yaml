@@ -8,9 +8,9 @@ services:
       VITE_API_URL=/api npm run build && 
       cd ../Backend && 
       npm install
-    startCommand: cd Backend && node server.js
+    startCommand: cd Backend && NODE_ENV=production node server.js
     staticPublishPath: ./Frontend/dist
-    healthCheckPath: /api/health
+    healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
