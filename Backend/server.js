@@ -1,43 +1,45 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
-require('dotenv').config();
 const path = require('path');
+require('dotenv').config();
 
 const app = express();
 
 // Middleware
-app.use(cors({
-    origin: process.env.NODE_ENV === 'production' 
-        ? 'https://careercraft-1-if2x.onrender.com'
-        : 'http://localhost:5173',
-    credentials: true
-}));
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Routes
+// API Routes - should come before static file serving
 const userRoutes = require('./routes/user.routes');
+const consultancyRoutes = require('./routes/consultancy.routes');
+
 app.use('/api/users', userRoutes);
+app.use('/api/consultancy', consultancyRoutes);
 
-// Serve static files in production
-if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, '../Frontend/dist')));
-    app.get('*', (req, res) => {
-        res.sendFile(path.join(__dirname, '../Frontend/dist/index.html'));
-    });
-}
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, '../Frontend/dist')));
 
-// Error handler
+// Handle React routing, return all requests to React app
+app.get('*', function(req, res) {
+    res.sendFile(path.join(__dirname, '../Frontend/dist/index.html'));
+});
+
+// Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ message: 'Something broke!' });
 });
 
 const PORT = process.env.PORT || 5000;
+
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => {
         console.log('Connected to MongoDB');
-        app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+        app.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`);
+            console.log('Static files path:', path.join(__dirname, '../Frontend/dist'));
+        });
     })
     .catch(err => console.error('MongoDB connection error:', err));

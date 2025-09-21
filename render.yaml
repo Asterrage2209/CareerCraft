@@ -17,7 +17,7 @@ services:
       - key: VITE_API_URL
         value: /api
       - key: PORT
-        sync: false
+        value: 5000
       - key: MONGODB_URI
         sync: false
       - key: JWT_SECRET
