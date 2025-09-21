@@ -9,8 +9,16 @@ const app = express();
 
 const port = process.env.PORT || 5000;
 
-app.use(cors());
+// Ensure CORS is configured properly
+app.use(cors({
+    origin: process.env.NODE_ENV === 'production' 
+        ? 'https://careercraft-1-if2x.onrender.com'
+        : 'http://localhost:5173',
+    credentials: true
+}));
+
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 mongoose.connect(process.env.MONGODB_URI)
 .then(() => {
@@ -21,7 +29,7 @@ mongoose.connect(process.env.MONGODB_URI)
     process.exit(1);
 });
 
-const userRoutes = require("./routes/user.routes");
+const userRoutes = require('./routes/user.routes');
 const consultancyRoutes = require("./routes/consultancy.routes");
 
 // API routes first

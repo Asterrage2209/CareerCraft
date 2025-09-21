@@ -37,8 +37,9 @@ const login = async (req, res) => {
     }
 }
 
-const signup = async (req, res) => {
-    try {
+const registerUser = async (req, res) => {
+  console.log('Signup request received:', req.body);
+  try {
         const { name, email, password, phone, role = "student", profilePicture } = req.body;
 
         const isExists = await userModel.findOne({ email });
@@ -60,9 +61,10 @@ const signup = async (req, res) => {
                 profilePicture: newUser.profilePicture
             } 
         });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+    } catch (error) {
+    console.error('Signup error:', error);
+    res.status(400).json({ message: error.message });
+  }
 }
 
 const getUserProfile = async (req, res) => {
@@ -114,7 +116,7 @@ const updateUserProfile = async (req, res) => {
 }
 module.exports = { 
     login, 
-    signup,
+    registerUser,
     getUserProfile,
     updateUserProfile
 };
