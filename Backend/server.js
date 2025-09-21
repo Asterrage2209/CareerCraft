@@ -1,10 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const dotenv = require("dotenv");
+require('dotenv').config();
 const path = require('path');
 
-dotenv.config();
 const app = express();
 
 // Middleware
@@ -19,14 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 const userRoutes = require('./routes/user.routes');
-const consultancyRoutes = require("./routes/consultancy.routes");
-app.use('/api/auth', userRoutes);
-app.use("/api/consultancy", consultancyRoutes);
-
-// Health check route
-app.get("/api/health", (req, res) => {
-    res.json({ message: "CareerCraft API is running!", status: "healthy" });
-});
+app.use('/api/users', userRoutes);
 
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {
