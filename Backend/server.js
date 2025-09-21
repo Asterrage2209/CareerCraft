@@ -6,13 +6,13 @@ require('dotenv').config();
 
 const app = express();
 
-// Request logging middleware
+// Debug logging middleware
 app.use((req, res, next) => {
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
     next();
 });
 
-// Essential middleware
+// Core middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -25,30 +25,37 @@ app.use('/api/users', userRoutes);
 app.use('/api/consultancy', consultancyRoutes);
 
 // Serve static files
-app.use(express.static(path.join(__dirname, '../Frontend/dist')));
+const distPath = path.join(__dirname, '../Frontend/dist');
+app.use(express.static(distPath));
 
-// SPA route handler
+// Handle SPA routing - using middleware instead of wildcard route
 app.use((req, res, next) => {
+    // Skip API routes
     if (req.path.startsWith('/api')) {
         return next();
     }
-    res.sendFile(path.join(__dirname, '../Frontend/dist/index.html'));
+    res.sendFile(path.join(distPath, 'index.html'));
 });
 
-// Error handler
+// Error handling middleware
 app.use((err, req, res, next) => {
     console.error('Server Error:', err);
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ 
+        message: process.env.NODE_ENV === 'production' 
+            ? 'Internal server error' 
+            : err.message 
+    });
 });
 
-// MongoDB connection
+// MongoDB connection and server startup
+const PORT = process.env.PORT || 5000;
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => {
-        console.log('Connected to MongoDB');
-        const PORT = process.env.PORT || 5000;
+        console.log('MongoDB Connected');
         app.listen(PORT, () => {
             console.log(`Server running on port ${PORT}`);
             console.log(`Environment: ${process.env.NODE_ENV}`);
+            console.log(`Static files path: ${distPath}`);
         });
     })
     .catch(err => {

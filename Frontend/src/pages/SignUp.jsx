@@ -66,28 +66,36 @@ export default function SignUp() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError('');
+        setIsLoading(true);
+
         try {
-            console.log('Signup attempt:', { email, name }); // Debug log
-            
             const response = await fetch('/api/users/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ email, password, name })
+                body: JSON.stringify({
+                    name,
+                    email,
+                    password
+                })
             });
 
             const data = await response.json();
-            console.log('Server response:', data); // Debug log
-
+            
             if (!response.ok) {
                 throw new Error(data.message || 'Signup failed');
             }
 
+            // Successful signup
+            console.log('Signup successful:', data);
             navigate('/login');
         } catch (error) {
             console.error('Signup error:', error);
             setError(error.message);
+        } finally {
+            setIsLoading(false);
         }
     };
     
