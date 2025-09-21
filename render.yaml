@@ -4,10 +4,25 @@ services:
     env: node
     buildCommand: |
       cd Frontend && 
-      rm -rf node_modules &&
       npm install && 
       npm run build && 
       cd ../Backend && 
-      rm -rf node_modules &&
       npm install
     startCommand: cd Backend && node server.js
+    staticPublishPath: ./Frontend/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        sync: false
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
