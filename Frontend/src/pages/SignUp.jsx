@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import AnimatedSection from '../components/AnimatedSection';
-import PasswordMeter from '../components/PasswordMeter';
+import { PasswordMeter } from '../components/Passwordmeter';
 import { checkPasswordStrength } from '../utils/auth';
 
 export default function SignUp() {
