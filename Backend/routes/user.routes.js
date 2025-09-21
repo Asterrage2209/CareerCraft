@@ -2,10 +2,9 @@ const express = require('express');
 const router = express.Router();
 const { registerUser, loginUser } = require('../controller/user.controller');
 
-// Debug middleware for user routes
+// Debug middleware
 router.use((req, res, next) => {
-    console.log(`[User Route] ${req.method} ${req.url}`);
-    console.log('Request body:', req.body);
+    console.log(`User route hit: ${req.method} ${req.path}`);
     next();
 });
 

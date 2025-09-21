@@ -67,27 +67,23 @@ export default function SignUp() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            console.log('Attempting signup with:', { email, password, name });
+            console.log('Signup attempt:', { email, name }); // Debug log
             
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/users/signup`, {
+            const response = await fetch('/api/users/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                credentials: 'include',
                 body: JSON.stringify({ email, password, name })
             });
 
-            console.log('Response status:', response.status);
-            
             const data = await response.json();
-            console.log('Response data:', data);
+            console.log('Server response:', data); // Debug log
 
             if (!response.ok) {
                 throw new Error(data.message || 'Signup failed');
             }
 
-            // Handle successful signup
             navigate('/login');
         } catch (error) {
             console.error('Signup error:', error);
