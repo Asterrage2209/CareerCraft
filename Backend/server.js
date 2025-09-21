@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
+const path = require('path');
 
 dotenv.config();
 const app = express();
@@ -38,6 +39,14 @@ app.use((err, req, res, next) => {
 app.use((req, res) => {
     res.status(404).json({ message: "Route not found" });
 });
+
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../Frontend/dist')));
+  
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../Frontend/dist/index.html'));
+  });
+}
 
 app.listen(port, () => {
     console.log(`Server is running on port: ${port}`);
