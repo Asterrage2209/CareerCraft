@@ -2,6 +2,8 @@
 
 CareerCraft is a modern, AI-powered career guidance platform that helps students and professionals navigate their career paths through personalized consultancy, job opportunities, and educational resources.
 
+🌐 **Live Demo:** [CareerCraft Web App](https://careercraft-1-if2x.onrender.com/)
+
 ## ✨ Features
 
 * 🤖 **AI Consultancy:** Interactive chat interface for personalized career advice
@@ -26,14 +28,14 @@ CareerCraft is a modern, AI-powered career guidance platform that helps students
 - MongoDB
 - JWT Authentication
 
-## 🚀 Getting Started
+## 🚀 Development Setup
 
 ### Prerequisites
 - Node.js (v16 or higher)
 - MongoDB
 - npm or yarn
 
-### Installation
+### Local Development
 
 1. **Clone the repository**
 ```bash
@@ -63,8 +65,6 @@ JWT_SECRET=your_jwt_secret
 GEMINI_API_KEY=your_gemini_api_key
 PORT=5000
 NODE_ENV=development
-PORT=5000
-MONGODB_URI=your_mongodb_connection_string
 ```
 
 Frontend/.env:
@@ -72,7 +72,7 @@ Frontend/.env:
 VITE_API_URL=http://localhost:5000/api
 ```
 
-4. **Start the Application**
+4. **Start Development Servers**
 ```bash
 # Start Backend Server
 cd Backend
@@ -110,6 +110,7 @@ CareerCraft/
 - ✅ User Authentication System
 - ✅ Basic AI Consultancy
 - ✅ Job Postings
+- ✅ Live Deployment
 - ⏳ Advanced AI Features (Coming Soon)
 - ⏳ Resume Builder (In Development)
 - ⏳ Interview Preparation Module (In Development)
@@ -121,3 +122,4 @@ We welcome contributions! Feel free to submit issues and pull requests.
 ## 📫 Feedback & Bug Reports
 
 Found a bug or have a suggestion? Please email us at slapandya1407@gmail.com
+
