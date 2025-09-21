@@ -31,15 +31,12 @@ app.get("/api/health", (req, res) => {
     res.json({ message: "CareerCraft API is running!", status: "healthy" });
 });
 
-// Serve static files from Frontend build
 app.use(express.static(path.join(__dirname, '../Frontend/dist')));
 
-// Handle React routing, return all requests to React app
-app.get('*', (req, res) => {
+app.get('/*', function(req, res) {
   res.sendFile(path.join(__dirname, '../Frontend/dist/index.html'));
 });
 
-// Error handling middleware should be last
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Something broke!' });
