@@ -66,24 +66,32 @@ export default function SignUp() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const validationErrors = validate();
-        setErrors(validationErrors);
-
-        if (Object.keys(validationErrors).length === 0) {
-            const result = await signup({
-                name: formData.name,
-                email: formData.email,
-                phone: formData.phone,
-                password: formData.password,
-                role: formData.role,
-                profilePicture: profilePicture
-            });
+        try {
+            console.log('Attempting signup with:', { email, password, name });
             
-            if (result.success) {
-                navigate('/');
-            } else {
-                setErrors({ general: result.error || 'Signup failed. Please try again.' });
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/users/signup`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({ email, password, name })
+            });
+
+            console.log('Response status:', response.status);
+            
+            const data = await response.json();
+            console.log('Response data:', data);
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Signup failed');
             }
+
+            // Handle successful signup
+            navigate('/login');
+        } catch (error) {
+            console.error('Signup error:', error);
+            setError(error.message);
         }
     };
     

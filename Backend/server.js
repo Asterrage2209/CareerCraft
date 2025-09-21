@@ -6,9 +6,9 @@ require('dotenv').config();
 
 const app = express();
 
-// Debug middleware
+// Debug logging
 app.use((req, res, next) => {
-    console.log(`${req.method} ${req.path}`);
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
     next();
 });
 
@@ -17,36 +17,45 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// API Routes
+// API Routes - must come before static files
 const userRoutes = require('./routes/user.routes');
 const consultancyRoutes = require('./routes/consultancy.routes');
 
 app.use('/api/users', userRoutes);
 app.use('/api/consultancy', consultancyRoutes);
 
-// Serve static files
-app.use(express.static(path.join(__dirname, '../Frontend/dist')));
+// Static file serving
+const distPath = path.join(__dirname, '../Frontend/dist');
+console.log('Serving static files from:', distPath);
+app.use(express.static(distPath));
 
-// Instead of using * wildcard, use a specific catch-all route
-app.use((req, res) => {
-    res.sendFile(path.join(__dirname, '../Frontend/dist/index.html'));
+// Catch-all route for SPA
+app.get('/*', function(req, res, next) {
+    if (req.url.startsWith('/api')) {
+        return next();
+    }
+    console.log('Serving index.html for:', req.url);
+    res.sendFile(path.join(distPath, 'index.html'));
 });
 
-// Error handling middleware
+// Error handler
 app.use((err, req, res, next) => {
-    console.error('Error:', err.stack);
-    res.status(500).json({ message: 'Something broke!' });
+    console.error('Server Error:', err);
+    res.status(500).json({ 
+        message: process.env.NODE_ENV === 'production' 
+            ? 'Internal server error' 
+            : err.message 
+    });
 });
 
+// Start server
 const PORT = process.env.PORT || 5000;
-
-// Connect to MongoDB and start server
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => {
-        console.log('Connected to MongoDB');
-        app.listen(PORT, () => {
-            console.log(`Server running on port ${PORT}`);
-            console.log(`Static files path: ${path.join(__dirname, '../Frontend/dist')}`);
-        });
+        console.log('MongoDB Connected');
+        app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
     })
-    .catch(err => console.error('MongoDB connection error:', err));
+    .catch(err => {
+        console.error('MongoDB connection error:', err);
+        process.exit(1);
+    });
