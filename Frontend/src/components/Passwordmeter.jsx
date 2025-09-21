@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function PasswordMeter({ strength }) {
+const PasswordMeter = ({ password }) => {
     const strengthLevels = {
         0: { label: 'Weak', color: 'bg-red-500', width: 'w-1/4' },
         1: { label: 'Medium', color: 'bg-yellow-500', width: 'w-1/2' },
@@ -19,3 +19,6 @@ export default function PasswordMeter({ strength }) {
         </div>
     );
 }
+
+// Change to named export
+export { PasswordMeter };

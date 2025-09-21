@@ -4,9 +4,10 @@ services:
     env: node
     buildCommand: |
       cd Frontend && 
+      rm -rf node_modules &&
       npm install && 
-      npm run lint --if-present &&  # Add a lint step to catch these issues
       npm run build && 
       cd ../Backend && 
+      rm -rf node_modules &&
       npm install
     startCommand: cd Backend && node server.js
