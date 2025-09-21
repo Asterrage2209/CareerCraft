@@ -24,6 +24,7 @@ mongoose.connect(process.env.MONGODB_URI)
 const userRoutes = require("./routes/user.routes");
 const consultancyRoutes = require("./routes/consultancy.routes");
 
+// API routes first
 app.use("/api/auth", userRoutes);
 app.use("/api/consultancy", consultancyRoutes);
 
@@ -31,12 +32,15 @@ app.get("/api/health", (req, res) => {
     res.json({ message: "CareerCraft API is running!", status: "healthy" });
 });
 
+// Serve static files
 app.use(express.static(path.join(__dirname, '../Frontend/dist')));
 
-app.get('/*', function(req, res) {
+// Simple catch-all route for client-side routing
+app.use((req, res) => {
   res.sendFile(path.join(__dirname, '../Frontend/dist/index.html'));
 });
 
+// Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Something broke!' });
